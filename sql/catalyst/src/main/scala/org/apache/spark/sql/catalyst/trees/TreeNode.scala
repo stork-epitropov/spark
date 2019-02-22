@@ -35,7 +35,7 @@ import org.apache.spark.sql.catalyst.errors._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.JoinType
 import org.apache.spark.sql.catalyst.plans.physical.{BroadcastMode, Partitioning}
-import org.apache.spark.sql.catalyst.util.StringUtils.StringConcat
+import org.apache.spark.sql.catalyst.util.StringUtils.{PlanStringConcat, StringConcat}
 import org.apache.spark.sql.catalyst.util.truncatedString
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
@@ -480,14 +480,14 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
       verbose: Boolean,
       addSuffix: Boolean = false,
       maxFields: Int = SQLConf.get.maxToStringFields): String = {
-    val concat = new StringConcat()
+    val concat = new PlanStringConcat()
 
     treeString(concat.append, verbose, addSuffix, maxFields)
     concat.toString
   }
 
   def treeString(
-      append: String => Unit,
+      append: String => Boolean,
       verbose: Boolean,
       addSuffix: Boolean,
       maxFields: Int): Unit = {
@@ -554,7 +554,7 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
   def generateTreeString(
       depth: Int,
       lastChildren: Seq[Boolean],
-      append: String => Unit,
+      append: String => Boolean,
       verbose: Boolean,
       prefix: String = "",
       addSuffix: Boolean = false,
